@@ -233,6 +233,25 @@ with tab1:
     analyze_button = st.button("Analyze Agent Risk", type="primary")
 
     if analyze_button:
+        missing_required_input = (
+            not agent_name.strip()
+            and not agent_purpose.strip()
+            and not tools
+            and not data_types
+            and not external_inputs
+        )
+
+        if missing_required_input:
+            st.error(
+                "Please enter at least some information about the AI agent before generating a risk report."
+            )
+            st.stop()
+
+        if not agent_purpose.strip():
+            st.warning(
+                "Agent purpose is empty. The analysis may be less useful without a clear description of what the agent does."
+            )
+
         profile = {
             "agent_name": agent_name,
             "agent_purpose": agent_purpose,
@@ -332,8 +351,8 @@ with tab1:
             ollama_summary=ollama_summary
         )
 
-        safe_agent_name = agent_name.strip().lower().replace(" ", "-") if agent_name else "agentguardian-report"
-
+        safe_agent_name = agent_name.strip().lower().replace(" ", "-") if agent_name.strip() else "agentguardian-report"
+        
         st.download_button(
             label="Download Markdown Report",
             data=markdown_report,
@@ -391,7 +410,7 @@ with tab2:
 with tab3:
     st.header("Sample Scenarios")
 
-    st.write("These scenarios will become clickable templates in a later step.")
+    st.write("Use these examples to test AgentGuardian with realistic agentic AI workflows.")
 
     scenarios = {
         "Customer Support Agent": "Reads customer support tickets, checks order history, drafts refund responses, and sends emails.",
