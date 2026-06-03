@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from risk_engine import calculate_risk_score
+from ollama_utils import generate_ollama_summary
 
 
 st.set_page_config(
@@ -18,6 +19,9 @@ st.write(
     AgentGuardian helps developers and security teams evaluate risks in agentic AI workflows.
     Describe an AI agent, select its tools and data access, and generate a practical security risk review.
     """
+)
+st.info(
+    "This app uses a rule-based risk engine and can optionally generate explanations with a local Ollama model. No external LLM API key is required."
 )
 
 st.divider()
@@ -188,6 +192,22 @@ with tab1:
 
         with st.expander("View Captured Agent Profile"):
             st.json(profile)
+            
+        st.divider()
+
+        st.subheader("Local LLM Security Analysis")
+
+        if use_ollama:
+            with st.spinner(f"Generating local security analysis with {ollama_model}..."):
+                ollama_summary = generate_ollama_summary(
+                    profile=profile,
+                    risk_result=result,
+                    model_name=ollama_model
+                )
+
+            st.markdown(ollama_summary)
+        else:
+            st.info("Ollama summary is turned off. Enable it in the sidebar to generate a local LLM analysis.")
 
 
 with tab2:
