@@ -10,6 +10,17 @@ def calculate_risk_score(profile):
     risks = []
     recommendations = []
 
+    category_scores = {
+    "Prompt Injection": 0,
+    "Tool Misuse": 0,
+    "Sensitive Data Exposure": 0,
+    "Autonomy": 0,
+    "Human Oversight": 0,
+    "Privilege and Access": 0,
+    "Output Handling": 0,
+    "Logging": 0
+    }
+    
     tools = profile.get("tools", [])
     data_types = profile.get("data_types", [])
     external_inputs = profile.get("external_inputs", [])
@@ -30,7 +41,7 @@ def calculate_risk_score(profile):
     ]
 
     if any(item in external_inputs for item in prompt_injection_inputs):
-        score += 15
+        category_scores["Prompt Injection"] += 15
         risks.append({
             "category": "Prompt Injection",
             "severity": "High",
@@ -55,7 +66,9 @@ def calculate_risk_score(profile):
     selected_high_impact_tools = [tool for tool in tools if tool in high_impact_tools]
 
     if selected_high_impact_tools:
-        score += 10 + (len(selected_high_impact_tools) * 3)
+        tool_score = 10 + (len(selected_high_impact_tools) * 3)
+        score += tool_score
+        category_scores["Tool Misuse"] += tool_score
         risks.append({
             "category": "Tool Misuse",
             "severity": "High",
@@ -80,7 +93,9 @@ def calculate_risk_score(profile):
     selected_sensitive_data = [data for data in data_types if data in sensitive_data]
 
     if selected_sensitive_data:
-        score += 10 + (len(selected_sensitive_data) * 4)
+        data_score = 10 + (len(selected_sensitive_data) * 4)
+        score += data_score
+        category_scores["Sensitive Data Exposure"] += data_score    
         risks.append({
             "category": "Sensitive Data Exposure",
             "severity": "High",
@@ -94,7 +109,7 @@ def calculate_risk_score(profile):
     # Excessive Autonomy Risk
     # -----------------------------
     if autonomy_level == "Executes automatically":
-        score += 25
+        category_scores["Autonomy"] += 25
         risks.append({
             "category": "Excessive Autonomy",
             "severity": "Critical",
@@ -105,7 +120,7 @@ def calculate_risk_score(profile):
         )
 
     elif autonomy_level == "Executes after approval":
-        score += 10
+        category_scores["Autonomy"] += 10
         risks.append({
             "category": "Controlled Autonomy",
             "severity": "Medium",
@@ -116,7 +131,7 @@ def calculate_risk_score(profile):
         )
 
     elif autonomy_level == "Drafts actions":
-        score += 5
+        category_scores["Autonomy"] += 5
         risks.append({
             "category": "Drafted Action Risk",
             "severity": "Low",
@@ -130,7 +145,7 @@ def calculate_risk_score(profile):
     # Human Approval Gap
     # -----------------------------
     if human_approval == "Not required":
-        score += 20
+        category_scores["Human Oversight"] += 20
         risks.append({
             "category": "Human Oversight Gap",
             "severity": "High",
@@ -141,7 +156,7 @@ def calculate_risk_score(profile):
         )
 
     elif human_approval == "Required for high-risk actions":
-        score += 5
+        category_scores["Human Oversight"] += 20
         risks.append({
             "category": "Partial Human Oversight",
             "severity": "Medium",
@@ -155,7 +170,7 @@ def calculate_risk_score(profile):
     # Privilege and Access Risk
     # -----------------------------
     if len(tools) >= 5:
-        score += 12
+        category_scores["Privilege and Access"] += 12
         risks.append({
             "category": "Excessive Tool Access",
             "severity": "High",
@@ -176,7 +191,7 @@ def calculate_risk_score(profile):
     ]
 
     if any(tool in tools for tool in output_sensitive_tools):
-        score += 8
+        category_scores["Output Handling"] += 8
         risks.append({
             "category": "Insecure Output Handling",
             "severity": "Medium",
@@ -190,7 +205,7 @@ def calculate_risk_score(profile):
     # Logging and Accountability
     # -----------------------------
     if autonomy_level in ["Executes automatically", "Executes after approval"]:
-        score += 7
+        category_scores["Logging"] += 7
         risks.append({
             "category": "Logging and Accountability",
             "severity": "Medium",
@@ -223,5 +238,6 @@ def calculate_risk_score(profile):
         "score": score,
         "risk_level": risk_level,
         "risks": risks,
-        "recommendations": unique_recommendations
+        "recommendations": unique_recommendations,
+        "category_scores": category_scores
     }
