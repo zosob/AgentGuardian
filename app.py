@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from risk_engine import calculate_risk_score
 
 
 st.set_page_config(
@@ -135,23 +136,58 @@ with tab1:
     analyze_button = st.button("Analyze Agent Risk", type="primary")
 
     if analyze_button:
-        st.success("Workflow captured successfully. Risk analysis engine will be added in Hour 2.")
-
-        st.subheader("Captured Agent Profile")
-
         profile = {
-            "Agent Name": agent_name,
-            "Purpose": agent_purpose,
-            "Tools": ", ".join(tools) if tools else "None selected",
-            "Data Types": ", ".join(data_types) if data_types else "None selected",
-            "External Inputs": ", ".join(external_inputs) if external_inputs else "None selected",
-            "Autonomy Level": autonomy_level,
-            "Human Approval": human_approval,
-            "Use Ollama": use_ollama,
-            "Ollama Model": ollama_model
+            "agent_name": agent_name,
+            "agent_purpose": agent_purpose,
+            "tools": tools,
+            "data_types": data_types,
+            "external_inputs": external_inputs,
+            "autonomy_level": autonomy_level,
+            "human_approval": human_approval,
+            "use_ollama": use_ollama,
+            "ollama_model": ollama_model
         }
 
-        st.json(profile)
+        result = calculate_risk_score(profile)
+
+        st.success("Risk analysis complete.")
+
+        st.subheader("Risk Summary")
+
+        if result["risk_level"] == "Critical":
+            st.error("Critical risk detected. This agent should not be deployed without strong safeguards.")
+        elif result["risk_level"] == "High":
+            st.warning("High risk detected. Review permissions, autonomy, and sensitive data access before deployment.")
+        elif result["risk_level"] == "Medium":
+            st.info("Medium risk detected. Add safeguards before production use.")
+        else:
+            st.success("Low risk detected. Continue monitoring and validating the workflow.")
+
+        metric_col1, metric_col2 = st.columns(2)
+
+        with metric_col1:
+            st.metric("Risk Score", f"{result['score']}/100")
+
+        with metric_col2:
+            st.metric("Risk Level", result["risk_level"])
+
+        st.divider()
+
+        st.subheader("Detected Risks")
+
+        if result["risks"]:
+            risk_df = pd.DataFrame(result["risks"])
+            st.dataframe(risk_df, use_container_width=True)
+        else:
+            st.info("No major risks detected based on the current inputs.")
+
+        st.subheader("Recommended Controls")
+
+        for index, recommendation in enumerate(result["recommendations"], start=1):
+            st.write(f"{index}. {recommendation}")
+
+        with st.expander("View Captured Agent Profile"):
+            st.json(profile)
 
 
 with tab2:
