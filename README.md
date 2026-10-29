@@ -60,11 +60,24 @@ AgentGuardian evaluates agentic AI workflows across several security risk catego
 AgentGuardian/
 ├── app.py
 ├── risk_engine.py
-├── ollama_utils.py
 ├── sample_scenarios.py
+├── ollama_utils.py
+├── risk_config.json
 ├── requirements.txt
 ├── README.md
 ├── .gitignore
+├── agentguardian/
+│   ├── __init__.py
+│   ├── config.py
+│   ├── models.py
+│   ├── reporting.py
+│   ├── sample_scenarios.py
+│   ├── scoring.py
+│   └── ui.py
+├── benchmarks/
+│   └── scenario_benchmarks.py
+├── tests/
+│   └── test_scoring.py
 └── screenshots/
 ```
 
@@ -207,6 +220,24 @@ Possible next steps:
 - Add policy recommendations for enterprise deployment
 - Add configurable risk weights
 - Add support for additional local models
+
+## Validation and Benchmarks
+
+The project includes a lightweight benchmark suite and automated tests for the risk engine.
+
+Run the tests:
+
+```bash
+python -m pytest tests/test_scoring.py -q
+```
+
+Run the benchmark scenarios:
+
+```bash
+python benchmarks/scenario_benchmarks.py
+```
+
+The benchmark file compares a few known scenarios against expected score and risk-level thresholds so new scoring changes remain explainable and regression-safe.
 
 ---
 

@@ -1,0 +1,66 @@
+{
+  "categories": [
+    "Prompt Injection",
+    "Tool Misuse",
+    "Sensitive Data Exposure",
+    "Autonomy",
+    "Human Oversight",
+    "Privilege and Access",
+    "Output Handling",
+    "Logging"
+  ],
+  "weights": {
+    "prompt_injection": 15,
+    "tool_misuse_base": 10,
+    "tool_misuse_per_tool": 3,
+    "sensitive_data_base": 10,
+    "sensitive_data_per_item": 4,
+    "autonomy_executes_automatically": 25,
+    "autonomy_executes_after_approval": 10,
+    "autonomy_drafts_actions": 5,
+    "human_oversight_not_required": 20,
+    "human_oversight_partial": 20,
+    "privilege_and_access_threshold": 5,
+    "privilege_and_access_score": 12,
+    "output_handling_score": 8,
+    "logging_score": 7
+  },
+  "thresholds": {
+    "Low": 30,
+    "Medium": 60,
+    "High": 80
+  },
+  "tool_names": {
+    "high_impact": [
+      "Email",
+      "Code execution",
+      "Payment system",
+      "Database",
+      "CRM",
+      "Files"
+    ],
+    "output_sensitive": [
+      "Email",
+      "Slack/Teams",
+      "Ticketing system",
+      "CRM"
+    ]
+  },
+  "sensitive_data": [
+    "Personally identifiable information",
+    "Financial data",
+    "Health data",
+    "Credentials or secrets",
+    "Customer records",
+    "Student records"
+  ],
+  "prompt_injection_inputs": [
+    "User messages",
+    "Emails",
+    "Websites",
+    "Uploaded files",
+    "API responses",
+    "Chat logs",
+    "Support tickets"
+  ]
+}
